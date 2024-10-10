@@ -1,0 +1,5 @@
+HTML minify:
+https://codebeautify.org/minify-html
+
+HTML - JSON stringify:
+https://jsonformatter.org/json-stringify-online

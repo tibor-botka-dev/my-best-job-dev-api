@@ -1,0 +1,5 @@
+Mongo db admin password:
+vEQKi1Mx6KRgaKyB
+
+Mongo db admin username:
+my-best-job-admin

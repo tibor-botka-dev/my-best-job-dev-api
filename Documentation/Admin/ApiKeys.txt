@@ -1,0 +1,5 @@
+Google maps API key:
+AIzaSyBL3-D7kmdfwzNFInLqf1oo444eUUQVT7E
+
+YouTube API key:
+AIzaSyA4MGMk5Gmxn3xnSpIRc_vQqMEurdBT8uU

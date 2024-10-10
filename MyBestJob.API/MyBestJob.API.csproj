@@ -1,0 +1,31 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+	<PropertyGroup>
+		<TargetFramework>net8.0</TargetFramework>
+		<Nullable>enable</Nullable>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<InvariantGlobalization>true</InvariantGlobalization>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="8.0.8" />
+		<PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="8.0.8" />
+		<PackageReference Include="Serilog" Version="4.0.1" />
+		<PackageReference Include="Serilog.Exceptions" Version="8.4.0" />
+		<PackageReference Include="Serilog.Extensions.Hosting" Version="8.0.0" />
+		<PackageReference Include="Serilog.Settings.Configuration" Version="8.0.2" />
+		<PackageReference Include="Serilog.Sinks.Console" Version="6.0.0" />
+		<PackageReference Include="Serilog.Sinks.Debug" Version="3.0.0" />
+		<PackageReference Include="Serilog.Sinks.File" Version="6.0.0" />
+		<PackageReference Include="Swashbuckle.AspNetCore" Version="6.7.0" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\MyBestJob.BLL\MyBestJob.BLL.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Folder Include="Logs\" />
+	  <Folder Include="Properties\PublishProfiles\" />
+	  <Folder Include="Properties\ServiceDependencies\" />
+	</ItemGroup>
+</Project>
