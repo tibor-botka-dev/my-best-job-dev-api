@@ -363,7 +363,7 @@ MigrationBackup/
 FodyWeavers.xsd
 
 # Documentation files
-Documentation/
+/Documentation
 
 # Application setting files
-appsettings*.json
+/MyBestJob.API/appsettings*.json
