@@ -24,7 +24,7 @@ public interface IUserService
 
     Task SaveTokens(IEnumerable<Claim> claims, JwtTokenViewModel jwtTokenViewModel);
     Task UpdateUser(EditUserViewModel viewModel);
-    Task CreateUser(CreateUserViewModel viewModel, Guid userId);
+    Task CreateUser(CreateUserViewModel viewModel);
     Task DeleteUser(Guid id);
 
     Task<List<GetUserViewModel>> GetUsers();
@@ -133,7 +133,7 @@ public class UserService(ILogger<UserService> logger,
             _logger.Error($"User {user.FullName} email changed to {user.Email}.");
     }
 
-    public async Task CreateUser(CreateUserViewModel viewModel, Guid userId)
+    public async Task CreateUser(CreateUserViewModel viewModel)
     {
         var user = await _userManager.FindByEmailAsync(viewModel.Email)
             ?? await _userManager.FindByNameAsync(viewModel.Email);
@@ -142,7 +142,6 @@ public class UserService(ILogger<UserService> logger,
             throw new UserExistsException(viewModel.Email);
 
         user = _mapper.Map<User>(viewModel);
-        user.CreatorUserId = userId;
 
         var result = await _userManager.CreateAsync(user);
         if (!result.Succeeded)

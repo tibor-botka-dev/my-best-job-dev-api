@@ -24,7 +24,6 @@ public static partial class Constants
         public const string Setting = Api + nameof(Setting);
         public const string GetMailSetting = Api + nameof(GetMailSetting);
         public const string GetEmailTemplates = Api + nameof(GetEmailTemplates);
-        public const string UpdateIdleSetting = Api + nameof(UpdateIdleSetting);
         public const string UpdateMailSetting = Api + nameof(UpdateMailSetting);
         public const string UpdateEmailTemplate = Api + nameof(UpdateEmailTemplate);
         public const string CreateEmailTemplateValue = Api + nameof(CreateEmailTemplateValue);

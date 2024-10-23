@@ -1,11 +1,10 @@
-﻿using MyBestJob.API.Extensions;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Localization;
+using MyBestJob.API.Extensions;
 using MyBestJob.BLL.Exceptions;
 using MyBestJob.BLL.Services;
 using MyBestJob.BLL.Stuff;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Localization;
-using Microsoft.Extensions.Options;
 using static MyBestJob.DAL.Constants.Constants;
 
 namespace MyBestJob.API.Controllers;
@@ -16,15 +15,13 @@ namespace MyBestJob.API.Controllers;
 public class InitController(ILogger<InitController> logger,
     IStringLocalizer<InitController> localizer,
     IInitService initService,
-    IUserService userService,
-    IOptions<AuthorizationOptions> authorizationOptions) : ControllerBase
+    IUserService userService) : ControllerBase
 {
     private readonly ILogger<InitController> _logger = logger;
     private readonly IStringLocalizer L = localizer;
 
     private readonly IInitService _initService = initService;
     private readonly IUserService _userService = userService;
-    private readonly AuthorizationOptions _authorizationOptions = authorizationOptions.Value;
 
     [HttpGet]
     public async Task<IActionResult> Init()
@@ -34,15 +31,18 @@ public class InitController(ILogger<InitController> logger,
             await _initService.InsertDefaultData();
 
             var user = await _userService.GetCurrentUser(User.Claims);
+            var languages = await _initService.GetLanguages();
+            var defaultLanguage = DefaultLanguages.DefaultLanguage;
             var (googleSignInUrl, googleSignUpUrl) = _initService.GetCheckGoogleUrls();
 
             return Ok(new
             {
                 ApplicationName,
                 Urls = Url.GetApiRoutes(),
-                IdleSetting = await _initService.GetIdleSetting(user?.Id),
                 RegexPatterns = RegexPatterns.GetRegexPatterns(),
                 Avatar = user?.AvatarUrl ?? user?.AvatarBase64,
+                languages,
+                defaultLanguage,
                 googleSignInUrl,
                 googleSignUpUrl
             });

@@ -1,11 +1,11 @@
 ﻿using AutoMapper;
+using Microsoft.Extensions.Options;
+using MongoFramework.Linq;
 using MyBestJob.BLL.Exceptions;
 using MyBestJob.BLL.ViewModels;
 using MyBestJob.DAL.Database;
 using MyBestJob.DAL.Database.Models;
 using MyBestJob.DAL.Enums;
-using Microsoft.Extensions.Options;
-using MongoFramework.Linq;
 
 namespace MyBestJob.BLL.Services;
 
@@ -17,8 +17,6 @@ public interface ISettingService
 
     Task UpdateEmailTemplate(EmailTemplateType emailTemplateType, EditEmailTemplateViewModel viewModel);
     Task UpdateMailSetting(EditMailSettingViewModel viewModel, Guid userId);
-
-    Task CreateOrUpdateIdleSetting(CreateEditIdleSettingViewModel viewModel, Guid userId);
 
     Task CreateEmailTemplateValue(CreateEmailTemplateValueViewModel viewModel);
     Task UpdateEmailTemplateValue(string key, EditEmailTemplateValueViewModel viewModel);
@@ -63,28 +61,6 @@ public class SettingService(MyBestJobDbContext context,
         viewModel.EmailTemplate = _mapper.Map<GetEmailTemplateViewModel>(emailTemplate);
 
         return viewModel;
-    }
-
-    public async Task CreateOrUpdateIdleSetting(CreateEditIdleSettingViewModel viewModel, Guid userId)
-    {
-        var idleSetting = await _context.IdleSettings.FirstOrDefaultAsync(x => x.CreatedByUserId == userId)
-            ?? await _context.IdleSettings.FirstOrDefaultAsync(x => x.CreatedByUserId == null)
-            ?? throw new MissingSettingException(nameof(IdleSetting));
-
-        if (idleSetting.CreatedByUserId == null)
-        {
-            idleSetting = _mapper.Map<IdleSetting>(viewModel);
-            idleSetting.CreatedByUserId = userId;
-
-            _context.IdleSettings.Add(idleSetting);
-        }
-        else
-        {
-            _mapper.Map(viewModel, idleSetting);
-            idleSetting.UpdatedByUserId = userId;
-        }
-
-        await _context.SaveChangesAsync();
     }
 
     public async Task UpdateMailSetting(EditMailSettingViewModel viewModel, Guid userId)

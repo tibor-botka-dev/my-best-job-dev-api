@@ -1,15 +1,15 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using MongoFramework.Linq;
 using MyBestJob.BLL.Exceptions;
 using MyBestJob.BLL.Stuff;
 using MyBestJob.BLL.ViewModels;
 using MyBestJob.BLL.ViewModels.Authentication;
 using MyBestJob.DAL.Database;
 using MyBestJob.DAL.Database.Models;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using MongoFramework.Linq;
 using Newtonsoft.Json;
 using System.Reflection;
 using System.Security.Claims;
@@ -21,8 +21,8 @@ namespace MyBestJob.BLL.Services;
 public interface IInitService
 {
     Task InsertDefaultData();
-    Task<GetIdleSettingViewModel> GetIdleSetting(Guid? userId = null);
     Task<List<RoleViewModel>> GetAndAddPolicyRoles(ClaimsPrincipal user);
+    Task<List<LanguageViewModel>> GetLanguages();
     (string signInUrl, string signUpUrl) GetCheckGoogleUrls();
 }
 
@@ -35,7 +35,6 @@ public class InitService(
     IAuthorizationService authorizationService,
     IOptions<MailSetting> mailSetting,
     IOptions<AdminSetting> adminSetting,
-    IOptions<IdleSetting> idleSetting,
     IOptions<GoogleSetting> googleSetting) : IInitService
 {
     private readonly ILogger<InitService> _logger = logger;
@@ -48,26 +47,14 @@ public class InitService(
 
     private readonly MailSetting _mailSetting = mailSetting.Value;
     private readonly AdminSetting _adminSetting = adminSetting.Value;
-    private readonly IdleSetting _idleSetting = idleSetting.Value;
     private readonly GoogleSetting _googleSetting = googleSetting.Value;
-
-    public async Task<GetIdleSettingViewModel> GetIdleSetting(Guid? userId = null)
-    {
-        var idleSetting = await _context.IdleSettings.FirstOrDefaultAsync(x => x.CreatedByUserId == userId)
-            ?? await _context.IdleSettings.FirstOrDefaultAsync(x => x.CreatedByUserId == null)
-            ?? throw new MissingSettingException(nameof(IdleSetting));
-        var viewModel = _mapper.Map<GetIdleSettingViewModel>(idleSetting);
-
-        return viewModel;
-    }
 
     public async Task InsertDefaultData()
     {
         await InsertDefaultRoles();
+        await InsertDefaultLanguages();
         await InsertDefaultAdmin();
-
         await InsertDefaultMailSetting();
-        await InsertDefaultIdleSetting();
 
         await _context.SaveChangesAsync();
     }
@@ -116,6 +103,17 @@ public class InitService(
         await _context.SaveChangesAsync();
     }
 
+    private async Task InsertDefaultLanguages()
+    {
+        if (await _context.Languages.AnyAsync())
+            return;
+
+        _context.Languages.AddRange(DataSeeder.Languages);
+        _logger.Trace("Languages added to database.");
+
+        await _context.SaveChangesAsync();
+    }
+
     private async Task InsertDefaultAdmin()
     {
         if (!await _context.Users.AnyAsync(x => x.Email == _adminSetting.Email))
@@ -126,6 +124,7 @@ public class InitService(
                 UserName = _adminSetting.UserName,
                 FirstName = _adminSetting.FirstName,
                 LastName = _adminSetting.LastName,
+                LanguageId = DefaultLanguages.HungaryId,
                 EmailConfirmed = true
             };
 
@@ -154,17 +153,6 @@ public class InitService(
         _logger.Trace("Mail settings added to database with email address: {0}", _mailSetting.Email);
     }
 
-    private async Task InsertDefaultIdleSetting()
-    {
-        var setting = await _context.IdleSettings
-            .FirstOrDefaultAsync(x => x.CreatedByUserId == null);
-        if (setting != null)
-            return;
-
-        _context.IdleSettings.Add(_idleSetting);
-        _logger.Trace("Idle settings added to database.");
-    }
-
     public (string signInUrl, string signUpUrl) GetCheckGoogleUrls()
     {
         var googleSignInUrlViewModel = _mapper.Map<GoogleUrlViewModel>(_googleSetting);
@@ -185,6 +173,14 @@ public class InitService(
         var googleSignUpUrl = $"{_googleSetting.AuthUrl}?{string.Join("&", googleSignUpUrlProperties)}";
 
         return (googleSignInUrl, googleSignUpUrl);
+    }
+
+    public async Task<List<LanguageViewModel>> GetLanguages()
+    {
+        var languages = await _context.Languages.ToListAsync();
+
+        var languageViewModels = _mapper.Map<List<LanguageViewModel>>(languages);
+        return languageViewModels;
     }
 
     //public FacebookSetting GetFacebookSetting()

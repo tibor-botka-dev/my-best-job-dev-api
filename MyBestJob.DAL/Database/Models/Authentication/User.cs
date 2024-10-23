@@ -10,6 +10,9 @@ namespace MyBestJob.DAL.Database.Models;
 public class User : MongoIdentityUser<Guid>, IBaseModel<Guid>
 {
     [Required]
+    public Guid LanguageId { get; set; }
+
+    [Required]
     public string LastName { get; set; } = string.Empty;
     [Required]
     public string FirstName { get; set; } = string.Empty;
@@ -26,7 +29,4 @@ public class User : MongoIdentityUser<Guid>, IBaseModel<Guid>
     public string? AvatarUrl { get; set; }
 
     public DateTime? LastChangedDate { get; set; }
-
-    public Guid? CreatorUserId { get; set; }
-    public User? CreatorUser { get; set; }
 }

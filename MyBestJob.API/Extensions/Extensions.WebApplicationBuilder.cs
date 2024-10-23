@@ -1,10 +1,14 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Localization;
+using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using MongoFramework;
+using MyBestJob.API.Factories;
+using MyBestJob.API.Middleware;
 using MyBestJob.BLL.Exceptions;
 using MyBestJob.BLL.Services;
 using MyBestJob.DAL.Constants;
@@ -27,6 +31,7 @@ public static partial class Extensions
         // Factories
         builder.Services.AddScoped<IUserClaimsPrincipalFactory<User>,
             UserClaimsPrincipalFactory<User, Role>>();
+        builder.Services.AddSingleton<IStringLocalizerFactory, JsonStringLocalizerFactory>();
 
         // Services
         builder.Services.AddScoped<IInitService, InitService>();
@@ -204,7 +209,6 @@ public static partial class Extensions
         ConfigureAndValidateAppSettings<MongoSetting>(builder);
         ConfigureAndValidateAppSettings<MailSetting>(builder);
         ConfigureAndValidateAppSettings<JwtSetting>(builder);
-        ConfigureAndValidateAppSettings<IdleSetting>(builder);
         ConfigureAndValidateAppSettings<RouteSetting>(builder);
         ConfigureAndValidateAppSettings<GoogleSetting>(builder);
     }
@@ -229,5 +233,21 @@ public static partial class Extensions
         return configErrors.Count == 0
             ? result
             : throw new ValidationException($"{configErrors.Count} konfigurációs hiba található a(z) {name}.cs fájlban: {string.Join("\n", configErrors)}");
+    }
+
+    public static void ConfigureMiddlewares(this WebApplication app)
+    {
+        app.UseMiddleware<LocalizationMiddleware>();
+    }
+
+    public static void ConfigureLocalization(this WebApplication app)
+    {
+        var supportedCultures = DataSeeder.Languages.GetSupportedCultures();
+        app.UseRequestLocalization(new RequestLocalizationOptions
+        {
+            DefaultRequestCulture = new RequestCulture(Constants.DefaultLanguages.DefaultLanguage),
+            SupportedCultures = supportedCultures,
+            SupportedUICultures = supportedCultures
+        });
     }
 }

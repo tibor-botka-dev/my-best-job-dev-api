@@ -1,6 +1,6 @@
-﻿using MyBestJob.DAL.Database.Models;
-using MongoFramework;
+﻿using MongoFramework;
 using MongoFramework.Infrastructure;
+using MyBestJob.DAL.Database.Models;
 
 namespace MyBestJob.DAL.Database;
 
@@ -8,8 +8,8 @@ public class MyBestJobDbContext(IMongoDbConnection connection) : MongoDbContext(
 {
     public MongoDbSet<User> Users { get; set; } = null!;
     public MongoDbSet<Role> Roles { get; set; } = null!;
-    public MongoDbSet<IdleSetting> IdleSettings { get; set; } = null!;
     public MongoDbSet<MailSetting> MailSettings { get; set; } = null!;
+    public MongoDbSet<Language> Languages { get; set; } = null!;
 
     public override async Task SaveChangesAsync(CancellationToken cancellationToken = default)
     {

@@ -19,9 +19,5 @@ public class BaseModel : IBaseModel<Guid>
     [Required]
     public DateTime LastChangedDate { get; set; }
 
-    public Guid? CreatedByUserId { get; set; }
-    public User? CreatedByUser { get; set; }
-
     public Guid? UpdatedByUserId { get; set; }
-    public User? UpdatedByUser { get; set; }
 }

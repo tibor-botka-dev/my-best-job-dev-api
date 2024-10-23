@@ -1,12 +1,12 @@
-﻿using MyBestJob.BLL.Attributes;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Localization;
+using MyBestJob.BLL.Attributes;
 using MyBestJob.BLL.Exceptions;
 using MyBestJob.BLL.Exceptions.Service;
 using MyBestJob.BLL.Services;
 using MyBestJob.BLL.Stuff;
 using MyBestJob.BLL.ViewModels;
 using MyBestJob.DAL.Enums;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Localization;
 using static MyBestJob.DAL.Constants.Constants;
 
 namespace MyBestJob.API.Controllers;
@@ -103,8 +103,7 @@ public class UserController(ILogger<UserController> logger,
     {
         try
         {
-            var userId = await User.Claims.GetRequiredId();
-            await _userService.CreateUser(viewModel, userId);
+            await _userService.CreateUser(viewModel);
 
             return NoContent();
         }

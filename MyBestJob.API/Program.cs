@@ -1,11 +1,11 @@
+using MongoDB.Driver;
 using MyBestJob.API.Extensions;
+using MyBestJob.API.Localizations;
 using MyBestJob.BLL.Exceptions;
 using MyBestJob.DAL.Constants;
 using MyBestJob.DAL.Database.Models;
-using MongoDB.Driver;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
-using Newtonsoft.Json.Serialization;
 using Serilog;
 using System.Text.Json.Serialization;
 
@@ -20,7 +20,7 @@ try
     builder.AddJwtBearer();
 
     builder.Services.AddRouting(x => x.LowercaseUrls = true);
-    builder.Services.AddLocalization();
+    builder.Services.AddLocalization(x => x.ResourcesPath = "Localizations");
     builder.Services.AddDistributedMemoryCache();
 
     builder.Services.AddControllers()
@@ -30,10 +30,9 @@ try
             x.SerializerSettings.NullValueHandling = NullValueHandling.Ignore;
             x.SerializerSettings.Converters.Add(new StringEnumConverter());
         })
-        .AddJsonOptions(x =>
-        {
-            x.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
-        });
+        .AddJsonOptions(x => x.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()))
+        .AddDataAnnotationsLocalization(x => x.DataAnnotationLocalizerProvider = (type, factory)
+            => factory.Create(typeof(Locales)));
 
     builder.Services.AddEndpointsApiExplorer();
     builder.Services.AddHttpClient(nameof(HttpClient));
@@ -48,14 +47,15 @@ try
 
     var app = builder.Build();
 
+    app.ConfigureLocalization();
+
     app.UseHttpsRedirection();
     app.UseStaticFiles();
     app.MapControllers();
 
-    app.UseSwagger();
-    app.UseSwaggerUI();
     if (app.Environment.IsDevelopment())
     {
+        app.UseSwagger();
         app.UseSwaggerUI();
         app.UseDeveloperExceptionPage();
     }
@@ -63,6 +63,8 @@ try
     app.UseCors(Constants.Policy);
     app.UseAuthentication();
     app.UseAuthorization();
+
+    app.ConfigureMiddlewares();
 
     app.Run();
 }

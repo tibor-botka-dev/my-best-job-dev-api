@@ -1,12 +1,12 @@
-﻿using MyBestJob.BLL.Attributes;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Localization;
+using MyBestJob.BLL.Attributes;
 using MyBestJob.BLL.Exceptions;
 using MyBestJob.BLL.Services;
 using MyBestJob.BLL.Stuff;
 using MyBestJob.BLL.ViewModels;
 using MyBestJob.DAL.Database.Models;
 using MyBestJob.DAL.Enums;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Localization;
 using static MyBestJob.DAL.Constants.Constants;
 
 namespace MyBestJob.API.Controllers;
@@ -67,33 +67,6 @@ public class SettingController(ILogger<SettingController> logger,
         {
             _logger.Error(ex, "Error during get email templates.");
             return BadRequest(L["Email sablonok lekérdezése nem sikerült"].Value);
-        }
-    }
-
-    [HttpPut, Route("update-idle-setting", Name = ApiRoutes.UpdateIdleSetting)]
-    public async Task<IActionResult> CreateOrUpdateIdleSetting(CreateEditIdleSettingViewModel viewModel)
-    {
-        try
-        {
-            var userId = await User.Claims.GetRequiredId();
-            await _settingService.CreateOrUpdateIdleSetting(viewModel, userId);
-
-            return NoContent();
-        }
-        catch (UserNotSignedInException ex)
-        {
-            _logger.LogWarning(ex, "User not signed in when update idle settings.");
-            return Conflict(L["A felhasználó nincs bejelentkezve"].Value);
-        }
-        catch (MissingSettingException ex)
-        {
-            _logger.LogWarning(ex, "Idle settings not found.");
-            return Conflict(L["Automatikus kiléptetési beállítások nem találhatóak"].Value);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error during update idle settings.");
-            return BadRequest(L["Automatikus kiléptetési beállítások mentése nem sikerült"].Value);
         }
     }
 

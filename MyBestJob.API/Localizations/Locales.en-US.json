@@ -1,0 +1,11 @@
+{
+  "Email cím mező kötelező": "Email address field is required.",
+  "Email cím mező nem érvényes email cím": "Email address field is not a valid email address.",
+  "Jelszó mező kötelező": "Password field is required.",
+  "Jelszó mező 6-20 karakter hosszú lehet": "Password field can be 6-20 characters long.",
+
+  "Kérjük erősítse meg e-mail címét": "Please confirm your email address to activate your account by clicking the button below.",
+  "Csatlakozott hozzánk": "Dear <strong>{0}</strong>!\n<p>Thank you for joining us.</p>",
+
+  "Ez egy teszt": "This is a test."
+}

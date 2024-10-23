@@ -25,4 +25,16 @@ public static class DataSeeder
                     Name = nameof(RoleEnum.Spectator),
                     NormalizedName = nameof(RoleEnum.Spectator).ToUpper() },
             ];
+
+    public static IEnumerable<Language> Languages
+        => [
+                new() {
+                    Id = DefaultLanguages.HungaryId,
+                    Name = "Magyar",
+                    ExtendedName = "hu-HU" },
+                new() {
+                    Id = DefaultLanguages.EnglishId,
+                    Name = "English",
+                    ExtendedName = DefaultLanguages.DefaultLanguage },
+            ];
 }
